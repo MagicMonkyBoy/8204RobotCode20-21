@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robottypes;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -18,7 +19,7 @@ public abstract class RobotType {
         this.length = length;               //length of robot in cm
     }
 
-    public abstract void init(HardwareMap hardwareMap, Telemetry telemetry);
+    public abstract void init(LinearOpMode mode); //deleted thes thingies cause mode can reference them.
 
     public abstract void moveTo(double x, double y, double targetPower);
     public abstract void turnTo(double x, double y, double targetPower);

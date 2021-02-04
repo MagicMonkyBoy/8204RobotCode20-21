@@ -12,13 +12,14 @@ public class AutonomousTestEncoders extends LinearOpMode {
 
     RobotType robot;
 
+
     @Override
     public void runOpMode() {
         robot = new BasicMecanum(0, 0, 0, 18, 18);
-        robot.init(hardwareMap, telemetry);
+        robot.init(this);
 
         waitForStart();
 
-        robot.moveTo(40, 0, .25);
+        robot.moveTo(400, 0, .25);
     }
 }
