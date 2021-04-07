@@ -27,8 +27,8 @@ public class BasicMecanum extends RobotType {
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
-    public BasicMecanum(double x, double y, double angleOffset, double width, double length) {
-        super(x, y, angleOffset, width, length);
+    public BasicMecanum(double x, double y, double currentAngle, double width, double length) {
+        super(x, y, currentAngle, width, length);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class BasicMecanum extends RobotType {
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = false;
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");     //imu of the expansion hub
         imu.initialize(parameters);
 
         telemetry.addData("Status", "Calibrating Gyro");
@@ -96,17 +96,21 @@ public class BasicMecanum extends RobotType {
     }
 
     @Override
-    public void moveTo(double x, double y, double targetPower) {
-        int targetXPos = (int)(x * COUNTS_PER_INCH) + ((lEncoder.getCurrentPosition() + rEncoder.getCurrentPosition())/2);
-        int targetYPos = (int)(x * COUNTS_PER_INCH) + bEncoder.getCurrentPosition();
+    public void moveTo(double nx, double ny, double targetPower) {
+        double targetAngle = Math.atan2(ny, nx)*(Math.PI/180);
+        int targetXPos = (int)((nx * COUNTS_PER_INCH)*(Math.cos(targetAngle - currentAngle)) + ((lEncoder.getCurrentPosition() + rEncoder.getCurrentPosition())/2));
+        int targetYPos = (int)(ny * COUNTS_PER_INCH) + bEncoder.getCurrentPosition();
+
         Orientation angles;
+
 
         while (mode.opModeIsActive()) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES);
-            telemetry.addData("X ", angles.firstAngle);
-            telemetry.addData("Y ", angles.secondAngle);
-            telemetry.addData("Z ", angles.thirdAngle);
-            telemetry.update();
+            currentAngle = angles.secondAngle;
+            //telemetry.addData("X ", angles.firstAngle);
+            telemetry.addData("Current Angle ", angles.secondAngle);
+            //telemetry.addData("Z ", angles.thirdAngle);
+            //telemetry.update();
         }
         fLMotor.setPower(0);
 
